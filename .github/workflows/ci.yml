@@ -114,7 +114,7 @@ jobs:
         set(ENV{PATH} "$ENV{GITHUB_WORKSPACE}${path_separator}$ENV{PATH}")
 
         execute_process(
-          COMMAND cmake --build build
+          COMMAND cmake --build build --config Release
           RESULT_VARIABLE result
         )
         if (NOT result EQUAL 0)
