@@ -8,6 +8,10 @@ on: [push]
 
 jobs:
   build:
+    #
+    #  Define a matrix of the operating system and compiler combinations
+    #  we want to build against.
+    #
     name: ${{ matrix.config.name }}
     runs-on: ${{ matrix.config.os }}
     strategy:
@@ -31,6 +35,18 @@ jobs:
             cc: "clang", cxx: "clang++"
           }
 
+    #
+    #  For each platform, we need to checkout the git repository,
+    #  and run CMake.
+    #
+    #  The logic below uses the approach demonstrated by Cristian Adam
+    #  which takes CMake's scripting mode (-P) and passes in from stdin
+    #  a script that incorporates values defined in the YAML environment.
+    #
+    #  Windows in particular needs the environment set up for compilation,
+    #  so the script recognizes when it is in that environment and
+    #  operates accordingly.
+    #
     steps:
     - uses: actions/checkout@v1
 
@@ -70,7 +86,15 @@ jobs:
           message(FATAL_ERROR "Bad exit status")
         endif()
 
-
+    #
+    #  As with the configure stage, the build uses CMake's scripting mode (-P)
+    #  and passes a script in on stdin.
+    #
+    #  Windows needs the environment set up for compilation - paths for the
+    #  compilation are not set up by default in command line environments,
+    #  unlike most Unix-like systems.  Accordingly the script recognizes when
+    #  it is on Windows and executes the necessary setup code.
+    #
     - name: Build
       shell: cmake -P {0}
       run: |
