@@ -1,13 +1,19 @@
+
+#include <iostream>
+
 int main (int argc, const char **argv)
 {
     if (argc == 1) {
+	std::cout << "Success\n";
 	return 0;
     }
 
     if (argv[1][0] == '1') {
+	std::cout << "Expected failure\n";
 	return 1;
     }
 
+    std::cout << "Generic failure\n";
     return -1;
 }
 
