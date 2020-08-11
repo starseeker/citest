@@ -2,42 +2,42 @@ name: ci-test-1
 on: [push]
 
 jobs:
-        job:
-                name: ${{ matrix.os }}-ci
-                runs-on:  ${{ matrix.os }}
-                strategy:
-                        fail-fast:  true
-                        matrix:
-                                os:  [ubuntu-latest, macos-latest, windows-latest]
+  job:
+    name: ${{ matrix.os }}-ci
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: true
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
 
 
         steps:
-                - uses: actions/checkout@v1
-                - uses: lukka/get-cmake@latest
+          - uses: actions/checkout@v1
+          - uses: lukka/get-cmake@latest
 
-                - name: Run CMake
-                  shell: cmake -P {0}
-                  run: |
-                   execute_process(
-                      COMMAND cmake
-                        -S .
-                        -B build
-                        -D CMAKE_BUILD_TYPE=$ENV{BUILD_TYPE}
-                      RESULT_VARIABLE result
-                    )
-                    if (NOT result EQUAL 0)
-                      message(FATAL_ERROR "Bad exit status")
-                    endif()
+          - name: Run CMake
+            shell: cmake -P {0}
+            run: |
+              execute_process(
+              COMMAND cmake
+              -S .
+              -B build
+              -D CMAKE_BUILD_TYPE=$ENV{BUILD_TYPE}
+              RESULT_VARIABLE result
+              )
+              if (NOT result EQUAL 0)
+              message(FATAL_ERROR "Bad exit status")
+              endif()
 
 
-                - name: Build
-                  shell: cmake -P {0}
-                  run: |
-                    execute_process(
-                      COMMAND cmake --build build
-                      RESULT_VARIABLE result
-                    )
-                    if (NOT result EQUAL 0)
-                       message(FATAL_ERROR "Bad exit status")
-                    endif()
+          - name: Build
+            shell: cmake -P {0}
+            run: |
+              execute_process(
+              COMMAND cmake --build build
+              RESULT_VARIABLE result
+              )
+              if (NOT result EQUAL 0)
+              message(FATAL_ERROR "Bad exit status")
+              endif()
 
