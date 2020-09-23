@@ -157,18 +157,12 @@ jobs:
         if ("${{ runner.os }}" STREQUAL "Windows")
            execute_process(
              COMMAND cmake --build build -j 1 --config Release --target ALL_BUILD
-             COMMAND cmake --build build -j 1 --config Release --target check
              RESULT_VARIABLE result
            )
         else ("${{ runner.os }}" STREQUAL "Windows")
            execute_process(
-             COMMAND cat build/build.ninja
-           )
-
-           execute_process(
              COMMAND sync
              COMMAND cmake --build build --verbose --config Release --target all
-             COMMAND cmake --build build --verbose --config Release --target check
              RESULT_VARIABLE result
            )
         endif ("${{ runner.os }}" STREQUAL "Windows")
@@ -176,6 +170,9 @@ jobs:
           if (NOT "${{ runner.os }}" STREQUAL "Windows")
            execute_process(
              COMMAND nm build/CMakeFiles/lemon.dir/lemon.c.o
+             )
+           execute_process(
+             COMMAND cat build/build.ninja
            )
           endif (NOT "${{ runner.os }}" STREQUAL "Windows")
           message(FATAL_ERROR "Bad exit status")
