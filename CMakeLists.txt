@@ -2,9 +2,9 @@
 cmake_minimum_required(VERSION 3.1.3)
 
 # set CMake project name
-project(CITEST)
+project(lemon)
 
-add_executable(citest citest.cpp)
+add_executable(lemon lemon.c)
 
 # Local Variables:
 # tab-width: 8

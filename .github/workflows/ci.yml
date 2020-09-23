@@ -1,8 +1,27 @@
 #
-#  Use setup similar to https://github.com/cristianadam/HelloWorld/
+#  This logic defines cross platform build testing for BRL-CAD using
+#  Github's "Actions" mechanism.
+#
+#  We define a setup similar to https://github.com/cristianadam/HelloWorld/
+#
+#  Github has a time limit on these tests, and we also don't want to stress the
+#  system too heavily (particularly if we want to run them per-commit.)   For
+#  testing purposes we're currently using distcheck, but for eventual
+#  production use we need to change our build targets to something more
+#  streamlined.  It is probably also worth disabling step and gdal based
+#  features for the standard tests, as those compilation pieces are quite
+#  expensive - they should probably be regulated to something like a once-a-day
+#  test.
+#
+#  TODO - figure out how to schedule chron based jobs as well as the per
+#  commit tests below, so we can define rarer but progressively more
+#  comprehensive and heaver test runs.
+#
+#  TODO - figure out if we can generate actual release binaries from the
+#  artifacts of these builds.
 #
 
-name: ci-test
+name: LEMON
 
 on: [push]
 
@@ -11,6 +30,11 @@ jobs:
     #
     #  Define a matrix of the operating system and compiler combinations
     #  we want to build against.
+    #
+    #  Note that for Windows the vcvars64.bat script is important - that
+    #  is what sets up environment variables to make sure we get the 64
+    #  bit version of the compiler and libraries.  See:
+    #  https://docs.microsoft.com/en-us/cpp/build/building-on-the-command-line
     #
     name: ${{ matrix.config.name }}
     runs-on: ${{ matrix.config.os }}
@@ -26,7 +50,7 @@ jobs:
           }
         - {
             name: "Ubuntu Latest GCC", artifact: "Linux.tar.xz",
-            os: ubuntu-latest,
+            os: ubuntu-20.04,
             cc: "gcc", cxx: "g++"
           }
         - {
@@ -49,6 +73,8 @@ jobs:
     #
     steps:
     - uses: actions/checkout@v1
+    - uses: lukka/get-cmake@latest
+    - uses: seanmiddleditch/gha-setup-ninja@master
 
     - name: Configure
       shell: cmake -P {0}
@@ -56,10 +82,10 @@ jobs:
         set(ENV{CC} ${{ matrix.config.cc }})
         set(ENV{CXX} ${{ matrix.config.cxx }})
 
-        if ("${{ runner.os }}" STREQUAL "Windows" AND NOT "x${{ matrix.config.environment_script }}" STREQUAL "x")
+          if ("${{ runner.os }}" STREQUAL "Windows" AND NOT "x${{ matrix.config.environment_script }}" STREQUAL "x")
           execute_process(
-            COMMAND "${{ matrix.config.environment_script }}" && set
-            OUTPUT_FILE environment_script_output.txt
+          COMMAND "${{ matrix.config.environment_script }}" && set
+          OUTPUT_FILE environment_script_output.txt
           )
           file(STRINGS environment_script_output.txt output_lines)
           foreach(line IN LISTS output_lines)
@@ -75,13 +101,28 @@ jobs:
         endif()
         set(ENV{PATH} "$ENV{GITHUB_WORKSPACE}${path_separator}$ENV{PATH}")
 
+        if ("${{ runner.os }}" STREQUAL "Windows" AND NOT "x${{ matrix.config.environment_script }}" STREQUAL "x")
         execute_process(
           COMMAND cmake
             -S .
             -B build
-            -D CMAKE_BUILD_TYPE=$ENV{BUILD_TYPE}
+            -D ENABLE_ALL=ON
+            -D CMAKE_BUILD_TYPE=Release
+            -D CMAKE_VERBOSE_DISTCHECK=ON
           RESULT_VARIABLE result
         )
+        else()
+        execute_process(
+          COMMAND cmake
+            -S .
+            -G Ninja
+            -B build
+            -D ENABLE_ALL=ON
+            -D CMAKE_BUILD_TYPE=Release
+            -D CMAKE_VERBOSE_DISTCHECK=ON
+          RESULT_VARIABLE result
+        )
+        endif()
         if (NOT result EQUAL 0)
           message(FATAL_ERROR "Bad exit status")
         endif()
@@ -113,11 +154,30 @@ jobs:
         endif()
         set(ENV{PATH} "$ENV{GITHUB_WORKSPACE}${path_separator}$ENV{PATH}")
 
-        execute_process(
-          COMMAND cmake --build build --config Release
-          RESULT_VARIABLE result
-        )
+        if ("${{ runner.os }}" STREQUAL "Windows")
+           execute_process(
+             COMMAND cmake --build build -j 1 --config Release --target ALL_BUILD
+             COMMAND cmake --build build -j 1 --config Release --target check
+             RESULT_VARIABLE result
+           )
+        else ("${{ runner.os }}" STREQUAL "Windows")
+           execute_process(
+             COMMAND cat build/build.ninja
+           )
+
+           execute_process(
+             COMMAND sync
+             COMMAND cmake --build build --verbose --config Release --target all
+             COMMAND cmake --build build --verbose --config Release --target check
+             RESULT_VARIABLE result
+           )
+        endif ("${{ runner.os }}" STREQUAL "Windows")
         if (NOT result EQUAL 0)
+          if (NOT "${{ runner.os }}" STREQUAL "Windows")
+           execute_process(
+             COMMAND nm build/CMakeFiles/lemon.dir/lemon.c.o
+           )
+          endif (NOT "${{ runner.os }}" STREQUAL "Windows")
           message(FATAL_ERROR "Bad exit status")
         endif()
 
