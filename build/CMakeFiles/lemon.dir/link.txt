@@ -1,1 +1,0 @@
-/usr/bin/cc -rdynamic CMakeFiles/lemon.dir/lemon.c.o -o lemon 

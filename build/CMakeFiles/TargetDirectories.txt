@@ -1,9 +1,0 @@
-/home/cyapp/citest/build/CMakeFiles/install/strip.dir
-/home/cyapp/citest/build/CMakeFiles/install/local.dir
-/home/cyapp/citest/build/CMakeFiles/edit_cache.dir
-/home/cyapp/citest/build/CMakeFiles/package_source.dir
-/home/cyapp/citest/build/CMakeFiles/install.dir
-/home/cyapp/citest/build/CMakeFiles/list_install_components.dir
-/home/cyapp/citest/build/CMakeFiles/rebuild_cache.dir
-/home/cyapp/citest/build/CMakeFiles/package.dir
-/home/cyapp/citest/build/CMakeFiles/lemon.dir
