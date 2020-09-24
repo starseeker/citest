@@ -1,4 +1,4 @@
-project(LEMON)
+project(BRL-CAD)
 
 cmake_minimum_required(VERSION 3.0)
 
