@@ -125,6 +125,7 @@ jobs:
             -D CMAKE_VERBOSE_DISTCHECK=ON
           RESULT_VARIABLE result
         )
+        execute_process(COMMAND sync)
         endif()
         if (NOT result EQUAL 0)
           message(FATAL_ERROR "Bad exit status")
@@ -166,9 +167,13 @@ jobs:
         else ("${{ runner.os }}" STREQUAL "Windows")
            execute_process(
              COMMAND cmake --build build -j 1 --verbose --config Release --target all
+             RESULT_VARIABLE result
+           )
+           execute_process(
              COMMAND cmake --build build -j 1 --verbose --config Release --target package
              RESULT_VARIABLE result
            )
+           execute_process(COMMAND sync)
         endif ("${{ runner.os }}" STREQUAL "Windows")
         if (NOT result EQUAL 0)
           message(FATAL_ERROR "Bad exit status")
@@ -187,6 +192,7 @@ jobs:
         else ("${{ runner.os }}" STREQUAL "Windows")
            execute_process(COMMAND cmake -E make_directory package)
            execute_process(COMMAND ls)
+           execute_process(COMMAND ls build/)
            execute_process(COMMAND mv build/BRL-CAD* package/)
         endif ("${{ runner.os }}" STREQUAL "Windows")
         if (NOT result EQUAL 0)
