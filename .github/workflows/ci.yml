@@ -45,22 +45,22 @@ jobs:
       fail-fast: true
       matrix:
         config:
-      # - {
-      #     name: "Windows Latest MSVC", artifact: "Windows-MSVC.tar.xz",
-      #     os: windows-latest,
-      #     cc: "cl", cxx: "cl",
-      #     environment_script: "C:/Program Files (x86)/Microsoft Visual Studio/2019/Enterprise/VC/Auxiliary/Build/vcvars64.bat"
-      #   }
+        - {
+            name: "Windows Latest MSVC", artifact: "Windows-MSVC.tar.xz",
+            os: windows-latest,
+            cc: "cl", cxx: "cl",
+            environment_script: "C:/Program Files (x86)/Microsoft Visual Studio/2019/Enterprise/VC/Auxiliary/Build/vcvars64.bat"
+          }
         - {
             name: "Ubuntu Latest GCC", artifact: "Linux.tar.xz",
             os: ubuntu-20.04,
             cc: "gcc", cxx: "g++"
           }
-      # - {
-      #     name: "macOS Latest Clang", artifact: "macOS.tar.xz",
-      #     os: macos-latest,
-      #     cc: "clang", cxx: "clang++"
-      #   }
+        - {
+            name: "macOS Latest Clang", artifact: "macOS.tar.xz",
+            os: macos-latest,
+            cc: "clang", cxx: "clang++"
+          }
 
     #
     #  For each platform, we need to checkout the git repository,
@@ -125,6 +125,7 @@ jobs:
             -D CMAKE_VERBOSE_DISTCHECK=ON
           RESULT_VARIABLE result
         )
+        # On platforms where we have it, make sure the files are in place with a sync
         execute_process(COMMAND sync)
         endif()
         if (NOT result EQUAL 0)
@@ -161,6 +162,9 @@ jobs:
         if ("${{ runner.os }}" STREQUAL "Windows")
            execute_process(
              COMMAND cmake --build build -j 1 --config Release --target ALL_BUILD
+             RESULT_VARIABLE result
+           )
+           execute_process(
              COMMAND cmake --build build -j 1 --verbose --config Release --target PACKAGE
              RESULT_VARIABLE result
            )
@@ -173,6 +177,7 @@ jobs:
              COMMAND cmake --build build -j 1 --verbose --config Release --target package
              RESULT_VARIABLE result
            )
+           # On platforms where we have it, make sure the files are in place with a sync
            execute_process(COMMAND sync)
         endif ("${{ runner.os }}" STREQUAL "Windows")
         if (NOT result EQUAL 0)
@@ -182,38 +187,20 @@ jobs:
     - name: Package
       shell: cmake -P {0}
       run: |
-        if ("${{ runner.os }}" STREQUAL "Windows")
-           execute_process(
-             COMMAND cmake -E make_directory package
-             COMMAND dir
-             COMMAND move BRL-CAD* package/
-             RESULT_VARIABLE result
-           )
-        else ("${{ runner.os }}" STREQUAL "Windows")
-           # https://cmake.org/pipermail/cmake/2007-July/015471.html
-           file(MAKE_DIRECTORY "${{ github.workspace }}/package")
-           message("${{ github.workspace }}/package")
-           file(GLOB pkgs "${{ github.workspace }}/build/BRL-CAD*")
-           foreach(p ${pkgs})
-              get_filename_component(proot ${p} NAME)
-              message("moving ${p} to ${{ github.workspace }}/package/${proot}")
-              file(RENAME "${p}" "${{ github.workspace }}/package/${proot}")
-              if (NOT EXISTS "${{ github.workspace }}/package/${proot}")
-                 message("RENAME FAILED!")
-              else (NOT EXISTS "${{ github.workspace }}/package/${proot}")
-                 message("created ${{ github.workspace }}/package/${proot}")
-              endif (NOT EXISTS "${{ github.workspace }}/package/${proot}")
-           endforeach(p ${pkgs})
-           file(GLOB_RECURSE pkgs "${{ github.workspace }}/package/*")
-           message("package contents:")
-           foreach(p ${pkgs})
-             message("package: ${p}")
-           endforeach(p ${pkgs})
-           set(result 0)
-        endif ("${{ runner.os }}" STREQUAL "Windows")
-        if (NOT result EQUAL 0)
-          message(FATAL_ERROR "Bad exit status")
-        endif()
+        # https://cmake.org/pipermail/cmake/2007-July/015471.html
+        file(MAKE_DIRECTORY "${{ github.workspace }}/package")
+        file(GLOB pkgs_zip "${{ github.workspace }}/build/BRL-CAD*zip")
+        file(GLOB pkgs_gz "${{ github.workspace }}/build/BRL-CAD*gz")
+        set(pkgs ${pkgs_zip} ${pkgs_gz})
+        foreach(p ${pkgs})
+           get_filename_component(proot ${p} NAME)
+           file(RENAME "${p}" "${{ github.workspace }}/package/${proot}")
+           if (NOT EXISTS "${{ github.workspace }}/package/${proot}")
+              message(FATAL_ERROR "RENAME of ${p} FAILED!")
+           else (NOT EXISTS "${{ github.workspace }}/package/${proot}")
+              message("staged ${{ github.workspace }}/package/${proot}")
+           endif (NOT EXISTS "${{ github.workspace }}/package/${proot}")
+        endforeach(p ${pkgs})
 
     - uses: actions/upload-artifact@v2
       with:
