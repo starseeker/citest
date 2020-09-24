@@ -160,11 +160,13 @@ jobs:
         if ("${{ runner.os }}" STREQUAL "Windows")
            execute_process(
              COMMAND cmake --build build -j 1 --config Release --target ALL_BUILD
+             COMMAND cmake --build build -j 1 --verbose --config Release --target PACKAGE
              RESULT_VARIABLE result
            )
         else ("${{ runner.os }}" STREQUAL "Windows")
            execute_process(
              COMMAND cmake --build build -j 1 --verbose --config Release --target all
+             COMMAND cmake --build build -j 1 --verbose --config Release --target package
              RESULT_VARIABLE result
            )
         endif ("${{ runner.os }}" STREQUAL "Windows")
@@ -177,7 +179,6 @@ jobs:
       run: |
         if ("${{ runner.os }}" STREQUAL "Windows")
            execute_process(
-             COMMAND cmake --build build -j 1 --config Release --target PACKAGE
              COMMAND cmake -E make_directory package
              COMMAND dir
              COMMAND move BRL-CAD* package/
@@ -185,7 +186,6 @@ jobs:
            )
         else ("${{ runner.os }}" STREQUAL "Windows")
            execute_process(
-             COMMAND cmake --build build -j 1 --verbose --config Release --target package
              COMMAND cmake -E make_directory package
              COMMAND ls
              COMMAND mv BRL-CAD* package/
