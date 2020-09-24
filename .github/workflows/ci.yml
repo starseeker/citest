@@ -105,28 +105,30 @@ jobs:
         set(ENV{PATH} "$ENV{GITHUB_WORKSPACE}${path_separator}$ENV{PATH}")
 
         if ("${{ runner.os }}" STREQUAL "Windows" AND NOT "x${{ matrix.config.environment_script }}" STREQUAL "x")
-        execute_process(
-          COMMAND cmake
-            -S .
-            -B build
-            -D ENABLE_ALL=ON
-            -D CMAKE_BUILD_TYPE=Release
-            -D CMAKE_VERBOSE_DISTCHECK=ON
-          RESULT_VARIABLE result
-        )
+          execute_process(
+            COMMAND cmake
+              -S .
+              -B build
+              -D ENABLE_ALL=ON
+              -D CMAKE_BUILD_TYPE=Release
+              -D CMAKE_VERBOSE_DISTCHECK=ON
+            RESULT_VARIABLE result
+          )
+          # Try Write-VolumeCache for Windows
+          execute_process(COMMAND powershell Write-VolumeCache C)
         else()
-        execute_process(
-          COMMAND cmake
-            -S .
-            -G Ninja
-            -B build
-            -D ENABLE_ALL=ON
-            -D CMAKE_BUILD_TYPE=Release
-            -D CMAKE_VERBOSE_DISTCHECK=ON
-          RESULT_VARIABLE result
+          execute_process(
+            COMMAND cmake
+              -S .
+              -G Ninja
+              -B build
+              -D ENABLE_ALL=ON
+              -D CMAKE_BUILD_TYPE=Release
+              -D CMAKE_VERBOSE_DISTCHECK=ON
+            RESULT_VARIABLE result
+          # On platforms where we have it, make sure the files are in place with a sync
+          execute_process(COMMAND sync)
         )
-        # On platforms where we have it, make sure the files are in place with a sync
-        execute_process(COMMAND sync)
         endif()
         if (NOT result EQUAL 0)
           message(FATAL_ERROR "Bad exit status")
@@ -191,7 +193,8 @@ jobs:
         file(MAKE_DIRECTORY "${{ github.workspace }}/package")
         file(GLOB pkgs_zip "${{ github.workspace }}/build/BRL-CAD*zip")
         file(GLOB pkgs_gz "${{ github.workspace }}/build/BRL-CAD*gz")
-        set(pkgs ${pkgs_zip} ${pkgs_gz})
+        file(GLOB pkgs_exe "${{ github.workspace }}/build/BRL-CAD*exe")
+        set(pkgs ${pkgs_zip} ${pkgs_gz} ${pkgs_exe})
         foreach(p ${pkgs})
            get_filename_component(proot ${p} NAME)
            file(RENAME "${p}" "${{ github.workspace }}/package/${proot}")
