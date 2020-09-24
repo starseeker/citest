@@ -217,6 +217,6 @@ jobs:
 
     - uses: actions/upload-artifact@v2
       with:
-        name: BRL-CAD
+        name: BRL-CAD_${{ runner.os }}
         path: ${{ github.workspace }}/package/*
 
