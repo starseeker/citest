@@ -45,22 +45,22 @@ jobs:
       fail-fast: true
       matrix:
         config:
-        - {
-            name: "Windows Latest MSVC", artifact: "Windows-MSVC.tar.xz",
-            os: windows-latest,
-            cc: "cl", cxx: "cl",
-            environment_script: "C:/Program Files (x86)/Microsoft Visual Studio/2019/Enterprise/VC/Auxiliary/Build/vcvars64.bat"
-          }
+      # - {
+      #     name: "Windows Latest MSVC", artifact: "Windows-MSVC.tar.xz",
+      #     os: windows-latest,
+      #     cc: "cl", cxx: "cl",
+      #     environment_script: "C:/Program Files (x86)/Microsoft Visual Studio/2019/Enterprise/VC/Auxiliary/Build/vcvars64.bat"
+      #   }
         - {
             name: "Ubuntu Latest GCC", artifact: "Linux.tar.xz",
             os: ubuntu-20.04,
             cc: "gcc", cxx: "g++"
           }
-        - {
-            name: "macOS Latest Clang", artifact: "macOS.tar.xz",
-            os: macos-latest,
-            cc: "clang", cxx: "clang++"
-          }
+      # - {
+      #     name: "macOS Latest Clang", artifact: "macOS.tar.xz",
+      #     os: macos-latest,
+      #     cc: "clang", cxx: "clang++"
+      #   }
 
     #
     #  For each platform, we need to checkout the git repository,
@@ -193,14 +193,16 @@ jobs:
            # https://cmake.org/pipermail/cmake/2007-July/015471.html
            file(MAKE_DIRECTORY "${{ github.workspace }}/package")
            message("${{ github.workspace }}/package")
-           file(GLOB_RECURSE pkgs "${{ github.workspace }}/build/BRL-CAD*")
+           file(GLOB pkgs "${{ github.workspace }}/build/BRL-CAD*")
            foreach(p ${pkgs})
-              message("${p}")
               get_filename_component(proot ${p} NAME)
-              file(RENAME ${p} "${{ github.workspace }}/package/${proot}")
+              message("moving ${p} to packages/${proot}")
+              file(RENAME "${p}" "${{ github.workspace }}/package/${proot}")
            endforeach(p ${pkgs})
            file(GLOB_RECURSE pkgs "${{ github.workspace }}/package")
-           message("${pkgs}")
+           foreach(p ${pkgs})
+             message("package: ${p}")
+           endforeach(p ${pkgs})
            set(result 0)
         endif ("${{ runner.os }}" STREQUAL "Windows")
         if (NOT result EQUAL 0)
