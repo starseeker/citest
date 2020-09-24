@@ -206,7 +206,7 @@ jobs:
            else (NOT EXISTS "${gw_path}/package/${proot}")
               message("staged ${gw_path}/package/${proot}")
            endif (NOT EXISTS "${gw_path}/package/${proot}")
-        endforeach(p ${pkgs})
+        endforeach()
 
     - uses: actions/upload-artifact@v2
       with:
