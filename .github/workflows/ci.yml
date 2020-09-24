@@ -190,11 +190,14 @@ jobs:
              RESULT_VARIABLE result
            )
         else ("${{ runner.os }}" STREQUAL "Windows")
-           file(MAKE_DIRECTORY ${{ github.workspace }}/package)
-           file(GLOB_RECURSE pkgs ${{ github.workspace }}/build/BRL-CAD*)
+           # https://cmake.org/pipermail/cmake/2007-July/015471.html
+           file(MAKE_DIRECTORY "${{ github.workspace }}/package")
+           message("${{ github.workspace }}/package")
+           file(GLOB_RECURSE pkgs "${{ github.workspace }}/build/BRL-CAD*")
            foreach(p ${pkgs})
+              message("${p}")
               get_filename_component(proot ${p} NAME)
-              file(RENAME ${p} ${{ github.workspace }}/package/${proot})
+              file(RENAME ${p} "${{ github.workspace }}/package/${proot}")
            endforeach(p ${pkgs})
         endif ("${{ runner.os }}" STREQUAL "Windows")
         if (NOT result EQUAL 0)
