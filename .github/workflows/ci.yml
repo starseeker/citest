@@ -160,13 +160,11 @@ jobs:
         if ("${{ runner.os }}" STREQUAL "Windows")
            execute_process(
              COMMAND cmake --build build -j 1 --config Release --target ALL_BUILD
-             COMMAND cmake --build build -j 1 --config Release --target check
              RESULT_VARIABLE result
            )
         else ("${{ runner.os }}" STREQUAL "Windows")
            execute_process(
              COMMAND cmake --build build -j 1 --verbose --config Release --target all
-             COMMAND cmake --build build -j 1 --verbose --config Release --target check
              RESULT_VARIABLE result
            )
         endif ("${{ runner.os }}" STREQUAL "Windows")
