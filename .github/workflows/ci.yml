@@ -196,7 +196,7 @@ jobs:
            file(GLOB pkgs "${{ github.workspace }}/build/BRL-CAD*")
            foreach(p ${pkgs})
               get_filename_component(proot ${p} NAME)
-              message("moving ${p} to "${{ github.workspace }}/package/${proot}")
+              message("moving ${p} to ${{ github.workspace }}/package/${proot}")
               file(RENAME "${p}" "${{ github.workspace }}/package/${proot}")
            endforeach(p ${pkgs})
            file(GLOB_RECURSE pkgs "${{ github.workspace }}/package")
