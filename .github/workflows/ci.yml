@@ -21,11 +21,11 @@ jobs:
       - name: Add path
         run: echo "$ENV{GITHUB_WORKSPACE}" | Out-File -Append -FilePath $env:GITHUB_PATH -Encoding utf8
 
-      - name: Configure
+      - name: Set up msbuild
         uses: microsoft/setup-msbuild
-        shell: cmd
+
+      - name: Configure
         run: |
-          PATH ENV{GITHUB_WORKSPACE};%PATH%
           cmake -S . -G Ninja -B build -D ENABLE_ALL=ON -D CMAKE_BUILD_TYPE=Release
           powershell Write-VolumeCache C
           powershell Write-VolumeCache D
