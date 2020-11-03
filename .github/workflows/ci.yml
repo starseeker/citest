@@ -27,15 +27,14 @@ jobs:
 
       - name: Configure
         run: |
+          echo "CC=cl" >> $GITHUB_ENV
+          echo "CXX=cl" >> $GITHUB_ENV
           cmake -S . -G Ninja -B build -D ENABLE_ALL=ON -D CMAKE_BUILD_TYPE=Release
           powershell Write-VolumeCache C
           powershell Write-VolumeCache D
 
       - name: Build
-        run: |
-          call $vcvars
-          set PATH=$ENV{GITHUB_WORKSPACE};%PATH%
-          cmake --build build --config Release --target all
+        run: cmake --build build --config Release --target all
 
   linux:
     name: Ubuntu Latest GCC
