@@ -131,6 +131,12 @@ jobs:
              endif()
            endforeach()
 
+
+           execute_process(
+             COMMAND "${{ matrix.config.environment_script }}" && set
+             RESULT_VARIABLE VOUT
+           )
+           message("VOUT: ${VOUT}")
         endif()
 
         set(path_separator ":")
