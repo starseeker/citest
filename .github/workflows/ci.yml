@@ -112,7 +112,7 @@ jobs:
            #
            # Off by default, but we can set VSCMD_DEBUG to report debug
            # info for debugging purposes (max value is 3 - we start at 1).
-           set(ENV{VSCMD_DEBUG} 1)
+           set(ENV{VSCMD_DEBUG} 2)
            execute_process(
              COMMAND "${{ matrix.config.environment_script }}" && set
              OUTPUT_FILE environment_script_output.txt
