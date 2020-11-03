@@ -25,6 +25,9 @@ jobs:
       - name: Add msbuild to PATH
         uses: microsoft/setup-msbuild@v1.0.2
 
+      - name: Add cl.exe to PATH
+        uses: ilammy/msvc-dev-cmd@v1
+
       - name: Configure
         run: |
           cmake -S . -B build -G Ninja -D CMAKE_C_COMPILER="cl.exe" -D CMAKE_CXX_COMPILER="cl.exe" -D ENABLE_ALL=ON -D CMAKE_BUILD_TYPE=Release
