@@ -23,7 +23,7 @@ jobs:
       - name: Configure
         run: |
           $vcvars
-          set PATH=$ENV{GITHUB_WORKSPACE};%PATH%
+          PATH ENV{GITHUB_WORKSPACE};%PATH%
           cmake -S . -G Ninja -B build -D ENABLE_ALL=ON -D CMAKE_BUILD_TYPE=Release
           powershell Write-VolumeCache C
           powershell Write-VolumeCache D
