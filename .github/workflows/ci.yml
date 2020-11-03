@@ -24,12 +24,7 @@ jobs:
         run: |
           call $vcvars
           set PATH=$ENV{GITHUB_WORKSPACE};%PATH%
-          cmake
-          -S .
-          -G Ninja
-          -B build
-          -D ENABLE_ALL=ON
-          -D CMAKE_BUILD_TYPE=Release
+          cmake -S . -G Ninja -B build -D ENABLE_ALL=ON -D CMAKE_BUILD_TYPE=Release
           powershell Write-VolumeCache C
           powershell Write-VolumeCache D
 
@@ -57,12 +52,7 @@ jobs:
       - name: Configure
         run: |
           export PATH=$ENV{GITHUB_WORKSPACE}:$PATH
-          cmake
-          -S .
-          -G Ninja
-          -B build
-          -D ENABLE_ALL=ON
-          -D CMAKE_BUILD_TYPE=Release
+          cmake -S . -G Ninja -B build -D ENABLE_ALL=ON -D CMAKE_BUILD_TYPE=Release
 
       - name: Build
         run: |
@@ -89,12 +79,7 @@ jobs:
           export PATH=$ENV{GITHUB_WORKSPACE}:$PATH
           export CC=clang
           export CXX=clang++
-          cmake
-          -S .
-          -G Ninja
-          -B build
-          -D ENABLE_ALL=ON
-          -D CMAKE_BUILD_TYPE=Release
+          cmake -S . -G Ninja -B build -D ENABLE_ALL=ON -D CMAKE_BUILD_TYPE=Release
 
       - name: Build
         run: |
