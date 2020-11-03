@@ -8,8 +8,6 @@ jobs:
     runs-on: windows-latest
     strategy:
       fail-fast: true
-    env:
-      vcvars: "C:/Program Files (x86)/Microsoft Visual Studio/2019/Enterprise/VC/Auxiliary/Build/vcvars64.bat"
     steps:
       - name: Setup - CMake
         uses: lukka/get-cmake@latest
@@ -20,9 +18,13 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v2
 
+      - name: Add path
+        run: echo "$ENV{GITHUB_WORKSPACE}" | Out-File -Append -FilePath $env:GITHUB_PATH -Encoding utf8
+
       - name: Configure
+        uses: microsoft/setup-msbuild
+        shell: cmd
         run: |
-          $vcvars
           PATH ENV{GITHUB_WORKSPACE};%PATH%
           cmake -S . -G Ninja -B build -D ENABLE_ALL=ON -D CMAKE_BUILD_TYPE=Release
           powershell Write-VolumeCache C
