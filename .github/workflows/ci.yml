@@ -116,7 +116,9 @@ jobs:
            execute_process(
              COMMAND "${{ matrix.config.environment_script }}" && set
              OUTPUT_FILE environment_script_output.txt
+             RESULT_VARIABLE VOUT
            )
+           message("VOUT: ${VOUT}")
 
            # Eliminate backslashes on the end of lines for file(STRINGS)
            file(READ environment_script_output.txt file_contents)
