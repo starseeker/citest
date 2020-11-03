@@ -18,11 +18,12 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v2
 
-      - name: Add path
+      - name: Add github workspace to path
+        # https://github.community/t/deprecated-add-path/136621
         run: echo "$ENV{GITHUB_WORKSPACE}" | Out-File -Append -FilePath $env:GITHUB_PATH -Encoding utf8
 
-      - name: Set up msbuild
-        uses: microsoft/setup-msbuild
+      - name: Add msbuild to PATH
+        uses: microsoft/setup-msbuild@v1.0.2
 
       - name: Configure
         run: |
