@@ -12,6 +12,17 @@
 #  features for the standard tests, as those compilation pieces are quite
 #  expensive - they should probably be regulated to something like a once-a-day
 #  test.
+#
+#  TODO - figure out how to schedule chron based jobs as well as the per
+#  commit tests below, so we can define rarer but progressively more
+#  comprehensive and heaver test runs.
+#
+#  TODO - figure out if we can generate actual release binaries from the
+#  artifacts of these builds.  When we do, we'll want to also incorporate
+#  some sort of periodic cleanup so we don't burn too much storage space
+#  with each build - see, for example:
+#  https://poweruser.blog/storage-housekeeping-on-github-actions-e2997b5b23d1?gi=f134f9f8b336
+#
 
 name: BRL-CAD
 
@@ -40,6 +51,16 @@ jobs:
             cc: "cl", cxx: "cl",
             environment_script: "C:/Program Files (x86)/Microsoft Visual Studio/2019/Enterprise/VC/Auxiliary/Build/vcvars64.bat"
           }
+       #- {
+       #    name: "Ubuntu Latest GCC", artifact: "Linux.tar.xz",
+       #    os: ubuntu-20.04,
+       #    cc: "gcc", cxx: "g++"
+       #  }
+       #- {
+       #    name: "macOS Latest Clang", artifact: "macOS.tar.xz",
+       #    os: macos-latest,
+       #    cc: "clang", cxx: "clang++"
+       #  }
 
     #
     #  For each platform, we need to checkout the git repository,
@@ -87,24 +108,15 @@ jobs:
         # used to apply those values to the current environment.
         if ("${{ runner.os }}" STREQUAL "Windows" AND NOT "x${{ matrix.config.environment_script }}" STREQUAL "x")
 
-           # Collect the dev env info - also, set VSCMD_DEBUG to report debug
+           # Collect the dev env info.
+           #
+           # Off by default, but we can set VSCMD_DEBUG to report debug
            # info for debugging purposes (max value is 3 - we start at 1).
-           set(ENV{VSCMD_DEBUG} 1)
+           #set(ENV{VSCMD_DEBUG} 1)
            execute_process(
-             COMMAND "${{ matrix.config.environment_script }}"
-             RESULT_VARIABLE BAT_OUT
-           )
-           message("BAT_OUT: ${BAT_OUT}")
-           execute_process(
-             COMMAND set
+             COMMAND "${{ matrix.config.environment_script }}" && set
              OUTPUT_FILE environment_script_output.txt
            )
-
-           execute_process(
-             COMMAND "${{ matrix.config.environment_script }}"
-             RESULT_VARIABLE BAT_OUT
-           )
-           message("BAT_OUT2: ${BAT_OUT}")
 
            # Eliminate backslashes on the end of lines for file(STRINGS)
            file(READ environment_script_output.txt file_contents)
@@ -220,30 +232,30 @@ jobs:
           message(FATAL_ERROR "Bad exit status")
         endif()
 
-   #- name: Package
-   #  shell: cmake -P {0}
-   #  run: |
-   #    file(TO_CMAKE_PATH "$ENV{GITHUB_WORKSPACE}" gw_path)
-   #    message("gw_path: ${gw_path}")
-   #    # https://cmake.org/pipermail/cmake/2007-July/015471.html
-   #    file(MAKE_DIRECTORY "${gw_path}/package")
-   #    file(GLOB pkgs_zip "${gw_path}/build/BRL-CAD*zip")
-   #    file(GLOB pkgs_gz "${gw_path}/build/BRL-CAD*gz")
-   #    file(GLOB pkgs_exe "${gw_path}/build/BRL-CAD*exe")
-   #    set(pkgs ${pkgs_zip} ${pkgs_gz} ${pkgs_exe})
-   #    foreach(praw ${pkgs})
-   #       string(REPLACE "\\" "/" p ${praw})
-   #       get_filename_component(proot ${p} NAME)
-   #       file(RENAME "${p}" "${gw_path}/package/${proot}")
-   #       if (NOT EXISTS "${gw_path}/package/${proot}")
-   #          message(FATAL_ERROR "RENAME of ${p} FAILED!")
-   #       else (NOT EXISTS "${gw_path}/package/${proot}")
-   #          message("staged ${gw_path}/package/${proot}")
-   #       endif (NOT EXISTS "${gw_path}/package/${proot}")
-   #    endforeach()
+    - name: Package
+      shell: cmake -P {0}
+      run: |
+        file(TO_CMAKE_PATH "$ENV{GITHUB_WORKSPACE}" gw_path)
+        message("gw_path: ${gw_path}")
+        # https://cmake.org/pipermail/cmake/2007-July/015471.html
+        file(MAKE_DIRECTORY "${gw_path}/package")
+        file(GLOB pkgs_zip "${gw_path}/build/BRL-CAD*zip")
+        file(GLOB pkgs_gz "${gw_path}/build/BRL-CAD*gz")
+        file(GLOB pkgs_exe "${gw_path}/build/BRL-CAD*exe")
+        set(pkgs ${pkgs_zip} ${pkgs_gz} ${pkgs_exe})
+        foreach(praw ${pkgs})
+           string(REPLACE "\\" "/" p ${praw})
+           get_filename_component(proot ${p} NAME)
+           file(RENAME "${p}" "${gw_path}/package/${proot}")
+           if (NOT EXISTS "${gw_path}/package/${proot}")
+              message(FATAL_ERROR "RENAME of ${p} FAILED!")
+           else (NOT EXISTS "${gw_path}/package/${proot}")
+              message("staged ${gw_path}/package/${proot}")
+           endif (NOT EXISTS "${gw_path}/package/${proot}")
+        endforeach()
 
-   #- uses: actions/upload-artifact@v2
-   #  with:
-   #    name: BRL-CAD_${{ runner.os }}
-   #    path: ${{ github.workspace }}/package/*
+    - uses: actions/upload-artifact@v2
+      with:
+        name: BRL-CAD_${{ runner.os }}
+        path: ${{ github.workspace }}/package/*
 
