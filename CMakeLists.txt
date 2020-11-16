@@ -29,21 +29,8 @@ include(ExternalProject_Target)
 
 add_definitions(-g)
 
-include("${CMAKE_CURRENT_SOURCE_DIR}/netpbm.cmake")
+include("${CMAKE_CURRENT_SOURCE_DIR}/stepcode.cmake")
 
-include_directories("${CMAKE_BINARY_DIR}/include")
-include_directories("${CMAKE_BINARY_DIR}/include/netpbm")
-add_executable(test main.c)
-target_link_libraries(test netpbm)
-add_dependencies(test netpbm_stage)
-
-add_custom_command(
-  OUTPUT ${CMAKE_BINARY_DIR}/ppm.stamp
-  COMMAND test ${CMAKE_CURRENT_SOURCE_DIR}/m35.ppm
-  COMMAND ${CMAKE_COMMAND} -E touch ${CMAKE_BINARY_DIR}/ppm.stamp
-  DEPENDS test
-  )
-add_custom_target(ppmtest ALL DEPENDS ${CMAKE_BINARY_DIR}/ppm.stamp)
 
 # Local Variables:
 # tab-width: 8
