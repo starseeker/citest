@@ -57,13 +57,13 @@ function(relative_rpath outvar)
   # IFF the caller tells us to, lengthen the relative path to a
   # specified length.  This is useful in scenarios where the relative
   # path is the only viable option
-  if (R_LEN and NOT APPLE)
+  if (R_LEN AND NOT APPLE)
     string(LENGTH "${RELATIVE_RPATH}" CURR_LEN)
     while("${CURR_LEN}" LESS "${R_LEN}")
       set(RELATIVE_RPATH "${RELATIVE_RPATH}:")
       string(LENGTH "${RELATIVE_RPATH}" CURR_LEN)
     endwhile("${CURR_LEN}" LESS "${R_LEN}")
-  endif (R_LEN and NOT APPLE)
+  endif (R_LEN AND NOT APPLE)
 
   set(${outvar} "${RELATIVE_RPATH}" PARENT_SCOPE)
 
