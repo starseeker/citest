@@ -25,7 +25,7 @@ std_build_rpath()
 # 3rd party build outputs use a CMAKE_RPATH_BUILD setting that is different
 # from the "vanilla" management used with other BRL-CAD targets.  The
 # function below encapsulates the setup needed for CMAKE_RPATH_BUILD
-ext_build_rpath()
+#ext_build_rpath()
 
 
 set(CMAKE_INSTALL_PREFIX "/usr/test/")
