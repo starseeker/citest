@@ -109,12 +109,6 @@ jobs:
           export PATH=$ENV{GITHUB_WORKSPACE}:$PATH
           cmake --build build --config Release --target exptest
 
-      - name: Otool
-        run: |
-          export PATH=$ENV{GITHUB_WORKSPACE}:$PATH
-          otool -l build/bin/exp2cxx
-          otool -l build/lib/libstepcore.so
-
 #     - name: Upload Package
 #       uses: actions/upload-artifact@v2
 #       with:

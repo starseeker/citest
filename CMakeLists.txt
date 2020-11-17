@@ -36,11 +36,17 @@ add_definitions(-g)
 
 include("${CMAKE_CURRENT_SOURCE_DIR}/stepcode.cmake")
 
+add_custom_target(otool_run ALL
+  COMMAND otool -l ${CMAKE_BINARY_DIR}/bin/exp2cxx
+  COMMAND otool -l ${CMAKE_BINARY_DIR}/lib/libstepcore*
+  DEPENDS exp2cxx_exe_stage
+  )
+
 add_custom_command(
   OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/exp.stamp
   COMMAND ${CMAKE_CURRENT_BINARY_DIR}/bin/exp2cxx ${CMAKE_CURRENT_SOURCE_DIR}/stepcode/data/ap203/ap203.exp
   COMMAND ${CMAKE_COMMAND} -E touch ${CMAKE_CURRENT_BINARY_DIR}/exp.stamp
-  DEPENDS exp2cxx_exe_stage
+  DEPENDS exp2cxx_exe_stage otool_run
   )
 add_custom_target(exptest ALL DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/exp.stamp)
 
