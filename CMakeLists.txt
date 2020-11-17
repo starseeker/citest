@@ -26,11 +26,17 @@ set(CMAKE_INSTALL_PREFIX "/usr/test/")
 
 include(ExternalProject)
 include(ExternalProject_Target)
-
 add_definitions(-g)
 
 include("${CMAKE_CURRENT_SOURCE_DIR}/stepcode.cmake")
 
+add_custom_command(
+  OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/exp.stamp
+  COMMAND ${CMAKE_CURRENT_BINARY_DIR}/bin/exp2cxx ${CMAKE_CURRENT_SOURCE_DIR}/stepcode/data/ap203/ap203.exp
+  COMMAND ${CMAKE_COMMAND} -E touch ${CMAKE_CURRENT_BINARY_DIR}/exp.stamp
+  DEPENDS exp2cxx_exe_stage
+  )
+add_custom_target(exptest ALL DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/exp.stamp)
 
 # Local Variables:
 # tab-width: 8
