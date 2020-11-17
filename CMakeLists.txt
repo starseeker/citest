@@ -20,11 +20,12 @@ set(CMAKE_BUILD_WITH_INSTALL_RPATH FALSE)
 set(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
 relative_rpath(RELPATH)
 set(CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/${LIB_DIR}${RELPATH}")
+std_build_rpath()
 
 # 3rd party build outputs use a CMAKE_RPATH_BUILD setting that is different
 # from the "vanilla" management used with other BRL-CAD targets.  The
 # function below encapsulates the setup needed for CMAKE_RPATH_BUILD
-ext_build_rpath()
+#ext_build_rpath()
 
 
 set(CMAKE_INSTALL_PREFIX "/usr/test/")
