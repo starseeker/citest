@@ -27,30 +27,24 @@ std_build_rpath()
 # function below encapsulates the setup needed for CMAKE_RPATH_BUILD
 ext_build_rpath()
 
+
 set(CMAKE_INSTALL_PREFIX "/usr/test/")
 
 include(ExternalProject)
 include(ExternalProject_Target)
-
 add_definitions(-g)
 
-include("${CMAKE_CURRENT_SOURCE_DIR}/netpbm.cmake")
-
-std_build_rpath()
-
-include_directories("${CMAKE_BINARY_DIR}/include")
-include_directories("${CMAKE_BINARY_DIR}/include/netpbm")
-add_executable(test main.c)
-target_link_libraries(test netpbm)
-add_dependencies(test netpbm_stage)
+include("${CMAKE_CURRENT_SOURCE_DIR}/stepcode.cmake")
 
 add_custom_command(
-  OUTPUT ${CMAKE_BINARY_DIR}/ppm.stamp
-  COMMAND test ${CMAKE_CURRENT_SOURCE_DIR}/m35.ppm
-  COMMAND ${CMAKE_COMMAND} -E touch ${CMAKE_BINARY_DIR}/ppm.stamp
-  DEPENDS test
+  OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/exp.stamp
+  COMMAND ${CMAKE_CURRENT_BINARY_DIR}/bin/exp2cxx ${CMAKE_CURRENT_SOURCE_DIR}/stepcode/data/ap203/ap203.exp
+  COMMAND ${CMAKE_COMMAND} -E touch ${CMAKE_CURRENT_BINARY_DIR}/exp.stamp
+  DEPENDS exp2cxx_exe_stage
   )
-add_custom_target(ppmtest ALL DEPENDS ${CMAKE_BINARY_DIR}/ppm.stamp)
+add_custom_target(exptest ALL DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/exp.stamp)
+
+std_build_rpath()
 
 # Local Variables:
 # tab-width: 8
